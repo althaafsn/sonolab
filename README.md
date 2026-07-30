@@ -6,7 +6,7 @@ Open research / portfolio work on **in-pipe ultrasonic geometry**: physics engin
 
 ![Reconstructed pipe wall (Block 8)](docs/demo/block8/survey3d_cloud.png)
 
-**[Open the interactive 3D demo](docs/demo/block8/survey3d_view.html)** · [Unwrapped \(R(\theta,z)\) map](docs/demo/block8/survey3d_Rmap.png) · [Orbit clip](docs/demo/block8/orbit.mp4)
+**[Live site](https://althaafsn.github.io/sonolab/)** · **[Open the interactive 3D demo](https://althaafsn.github.io/sonolab/demo/block8/survey3d_view.html)** · [Unwrapped \(R(\theta,z)\) map](docs/demo/block8/survey3d_Rmap.png) · [Orbit clip](docs/demo/block8/orbit.mp4)
 
 ---
 

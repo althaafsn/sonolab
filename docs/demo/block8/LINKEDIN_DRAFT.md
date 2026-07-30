@@ -1,8 +1,8 @@
 # LinkedIn — Block 8 hero post (draft)
 
-**When:** publish after https://github.com/althaafsn/sonolab is public.  
+**When:** publish after the live site is up.  
 **Next project post:** schedule ~10–14 days later (do not dump every project this week).  
-**Pin / Featured:** link the repo (or this post) for 2–3 weeks while applications are active.
+**Pin / Featured:** link the live site (or this post) for 2–3 weeks while applications are active.
 
 **Do not** name commercial ILI vendors or product lines in this post.
 
@@ -14,7 +14,8 @@ SonoLab separates physics truth (Lab A: 3D scalar FDTD) from a blind estimator (
 
 Block 8 packaging: parallel acquire at 1° × 16 z, interactive mesh you can orbit, color = radius from the tool (dents read as geometry, not a detector dashboard).
 
-Repo + interactive demo: https://github.com/althaafsn/sonolab  
+Live demo: https://althaafsn.github.io/sonolab/  
+Code: https://github.com/althaafsn/sonolab  
 (physics: 3D_scalar_acoustic portfolio demo - not a field inspection product)
 
 Happy to talk ultrasonic NDE, inverse problems, and applied ML / software roles.

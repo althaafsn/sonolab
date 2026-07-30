@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SonoLab — echoes to 3D pipe wall</title>
+  <meta name="description" content="Open research: reconstruct a dense 3D pipe inner wall from ultrasonic echoes under unknown pose and fluid sound speed."/>
+  <meta property="og:title" content="SonoLab"/>
+  <meta property="og:description" content="Echoes → 3D pipe wall. Interactive demo of blind ultrasonic geometry."/>
+  <meta property="og:image" content="demo/block8/survey3d_cloud.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/site.css"/>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-media" aria-hidden="true">
+      <video autoplay muted loop playsinline poster="demo/block8/survey3d_cloud.png">
+        <source src="demo/block8/orbit.mp4" type="video/mp4"/>
+      </video>
+      <img src="demo/block8/survey3d_cloud.png" alt="" hidden id="hero-fallback"/>
+    </div>
+    <div class="hero-shade"></div>
+    <div class="hero-copy">
+      <p class="brand">SonoLab</p>
+      <h1 class="headline">Echoes become a pipe wall you can orbit.</h1>
+      <p class="lede">
+        Blind ultrasonic geometry under unknown tool pose, fluid sound speed, and defect map.
+      </p>
+      <div class="cta-row">
+        <a class="cta cta-primary" href="demo/block8/survey3d_view.html">Open 3D demo</a>
+        <a class="cta cta-ghost" href="https://github.com/althaafsn/sonolab">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="story">
+      <h2>What you are looking at</h2>
+      <p>
+        A tool inside a pipe fires ultrasonic looks and records echoes.
+        SonoLab reconstructs the inner wall as a 3D surface - dents show up as geometry,
+        not as a separate detector scoreboard.
+      </p>
+      <p>
+        Physics engines generate truth for scoring.
+        The estimator only sees instrument TX/RX (plus an explicit labeled fluid calibration when absolute scale is needed).
+      </p>
+    </section>
+
+    <section class="section" id="labs">
+      <h2>Two labs, one product</h2>
+      <div class="split">
+        <div>
+          <span class="label">Lab A</span>
+          <h3>Physics referee</h3>
+          <p>
+            3D scalar FDTD (and optional SPECFEM) knows pose, fluid speed, and the wall.
+            It produces the echoes used for demos and tests.
+          </p>
+        </div>
+        <div>
+          <span class="label">Lab B</span>
+          <h3>Blind estimator</h3>
+          <p>
+            Joint geometry fit from picks alone.
+            No silent mill pipe ID.
+            Absolute scale only when you pass a labeled fluid sound speed.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="proof">
+      <h2>Proof stills</h2>
+      <p>Interactive mesh is the main demo. These frames show the same reconstruction flattened and in 3D.</p>
+      <div class="proof">
+        <figure>
+          <img src="demo/block8/survey3d_cloud.png" alt="Reconstructed 3D pipe wall point cloud with truth rings"/>
+          <figcaption>Lab B wall cloud with truth rings</figcaption>
+        </figure>
+        <figure>
+          <img src="demo/block8/survey3d_Rmap.png" alt="Unwrapped R of theta and z maps for truth, estimate, and residual"/>
+          <figcaption>Unwrapped R(θ, z): truth, estimate, residual</figcaption>
+        </figure>
+      </div>
+      <p class="swatch"><i aria-hidden="true"></i> Color in the 3D view = radius from tool center (near → red, far → blue)</p>
+    </section>
+
+    <section class="section" id="honesty">
+      <h2>Honest limits</h2>
+      <p class="honesty">
+        Physics label: <code>3D_scalar_acoustic</code>.
+        Display mesh is resampled for interaction; it is not a claim of commercial in-line inspection imaging density.
+        Portfolio / open research - not a field product.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <span>MIT · Althaaf</span>
+    <span>
+      <a href="demo/block8/survey3d_view.html">3D demo</a>
+      ·
+      <a href="https://github.com/althaafsn/sonolab">Source</a>
+      ·
+      <a href="ECHO_TO_GEOMETRY_VISION.md">Vision</a>
+    </span>
+  </footer>
+
+  <script>
+    const v = document.querySelector(".hero-media video");
+    const fallback = document.getElementById("hero-fallback");
+    if (v) {
+      v.addEventListener("error", () => {
+        v.hidden = true;
+        fallback.hidden = false;
+      });
+      v.play().catch(() => {
+        v.hidden = true;
+        fallback.hidden = false;
+      });
+    }
+  </script>
+</body>
+</html>
