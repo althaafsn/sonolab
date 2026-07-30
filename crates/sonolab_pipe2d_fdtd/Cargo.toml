@@ -1,0 +1,20 @@
+[package]
+name = "sonolab_pipe2d_fdtd"
+version = "0.1.0"
+edition = "2021"
+description = "Fast Lab A FDTD sector-scan engine for SonoLab pipe2d"
+license = "MIT"
+
+[lib]
+name = "sonolab_pipe2d_fdtd"
+crate-type = ["cdylib"]
+
+[dependencies]
+numpy = "0.23"
+pyo3 = { version = "0.23", features = ["extension-module"] }
+rayon = "1.10"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

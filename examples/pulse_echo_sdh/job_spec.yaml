@@ -1,0 +1,24 @@
+# Demo job for SonoLab portfolio path (EXAMPLE 01 conventional pulse-echo / SDH).
+# Units are SI. Overlays map onto SPECFEM EXAMPLE 01 00_parameters.yaml.
+
+schema_version: "0.1"
+job_id: pulse_echo_sdh_demo
+backend: example01
+
+description: >
+  Stock OpenUltrasonics conventional pulse-echo in steel with a side-drilled
+  hole. SonoLab materializes EXAMPLE 01, runs SPECFEM2D-UT, and packs
+  artifacts/ascan.npz + meta.json + a_scan.png.
+
+materials:
+  wall:
+    vp: 5950.0
+    vs: 3200.0
+    rho: 7850.0
+
+array:
+  f0_hz: 2250000.0
+  aperture_m: 0.002
+
+acquisition:
+  total_time_s: 0.000020

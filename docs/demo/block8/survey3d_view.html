@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SonoLab pipe3d view</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0e1116; color: #e8eaed;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif; overflow: hidden; }
+    #left { position: absolute; left: 16px; top: 14px; z-index: 2; max-width: 420px;
+      display: flex; flex-direction: column; gap: 10px; }
+    #hud { pointer-events: none; text-shadow: 0 1px 2px #000; }
+    #hud h1 { margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: 0.02em; }
+    #hud p { margin: 0; font-size: 12.5px; opacity: 0.88; line-height: 1.45; white-space: pre-line; }
+    #toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+    #toggles button {
+      pointer-events: auto; cursor: pointer; border: 1px solid #3a4250;
+      background: #1a2030; color: #e8eaed; font-size: 12px; padding: 6px 10px;
+      border-radius: 4px; font-family: inherit;
+    }
+    #toggles button.on { background: #2a4060; border-color: #6a9cc8; }
+    #cbar { position: absolute; right: 16px; top: 14px; z-index: 2;
+      width: 18px; height: 160px; border-radius: 3px; border: 1px solid #3a4250;
+      background: linear-gradient(to top, #2b6cb0, #38b2ac, #ecc94b, #e53e3e);
+      pointer-events: none; box-shadow: 0 1px 4px rgba(0,0,0,0.45); }
+    #cbar-labels { position: absolute; right: 40px; top: 14px; z-index: 2;
+      height: 160px; display: flex; flex-direction: column; justify-content: space-between;
+      font-size: 11px; opacity: 0.9; text-align: right; pointer-events: none;
+      text-shadow: 0 1px 2px #000; }
+    #hint { position: absolute; right: 16px; bottom: 14px; z-index: 2; font-size: 12px;
+      opacity: 0.7; pointer-events: none; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <div id="left">
+    <div id="hud">
+      <h1>pipe3d wall</h1>
+      <p id="meta">Loading…</p>
+    </div>
+    <div id="toggles">
+      <button type="button" id="btn-recon" class="on">recon</button>
+      <button type="button" id="btn-truth" class="on">truth</button>
+      <button type="button" id="btn-both" class="on">both</button>
+    </div>
+  </div>
+  <div id="cbar" title="radius from tool center"></div>
+  <div id="cbar-labels">
+    <span id="cbar-max">far</span>
+    <span>radius</span>
+    <span id="cbar-min">near</span>
+  </div>
+  <div id="hint">drag orbit · scroll zoom · right-drag pan</div>
+  <script src="survey3d_view_data.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const DATA = window.SURVEY3D_DATA;
+    if (!DATA) {
+      document.getElementById("meta").textContent =
+        "Missing survey3d_view_data.js sidecar next to this HTML.";
+      throw new Error("SURVEY3D_DATA missing");
+    }
+
+    const meta = document.getElementById("meta");
+    const sc = DATA.score || {};
+    const m = DATA.meta || {};
+    const acq = (m.acquireStepDeg ?? "?") + "° × " + (m.acquireNz ?? "?") + " z";
+    const disp = (m.displayStepDeg ?? "?") + "° × " + (m.displayNz ?? "?") + " z";
+    meta.textContent =
+      (DATA.title || "SonoLab pipe3d") + "\n" +
+      "acquire " + acq + "  ·  display " + disp + "\n" +
+      (m.honesty || "") + "\n" +
+      "physics=" + (sc.physics || m.physics || "?") + "\n" +
+      "rAbs/R=" + (sc.rAbsRmseOverR ?? "—") +
+      "  θerr=" + (sc.dentThetaErrDeg ?? "—") + "°" +
+      "  zerr=" + (sc.dentZErr ?? "—") + "\n" +
+      "color = radius from tool center (near→red, far→blue)\n" +
+      "not field mm-resolution; scalar FDTD portfolio demo";
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0e1116);
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 2000);
+    camera.position.set(55, 40, 70);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    const zMid = (DATA.dentHighlight && DATA.dentHighlight.z != null)
+      ? DATA.dentHighlight.z : 40;
+    controls.target.set(0, 0, zMid);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 0.75);
+    key.position.set(40, 60, 30);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xa0c4ff, 0.25);
+    fill.position.set(-30, -20, 50);
+    scene.add(fill);
+
+    {
+      const g = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, zMid - 20), new THREE.Vector3(0, 0, zMid + 20)
+      ]);
+      scene.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0x888888 })));
+      const mark = new THREE.Mesh(
+        new THREE.SphereGeometry(0.55, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      mark.position.set(0, 0, zMid);
+      scene.add(mark);
+    }
+
+    // Radius colormap: near (dent / small R) → red, mid → amber/teal, far → blue
+    const RAMP = [
+      new THREE.Color(0xe53e3e),
+      new THREE.Color(0xecc94b),
+      new THREE.Color(0x38b2ac),
+      new THREE.Color(0x2b6cb0),
+    ];
+    function colorAtT(t, out) {
+      const x = Math.min(1, Math.max(0, t)) * (RAMP.length - 1);
+      const i0 = Math.floor(x);
+      const i1 = Math.min(RAMP.length - 1, i0 + 1);
+      out.copy(RAMP[i0]).lerp(RAMP[i1], x - i0);
+      return out;
+    }
+    function radiusRange(pos) {
+      let rMin = Infinity, rMax = -Infinity;
+      for (let i = 0; i < pos.length; i += 3) {
+        const r = Math.hypot(pos[i], pos[i + 1]);
+        if (r < rMin) rMin = r;
+        if (r > rMax) rMax = r;
+      }
+      if (!(rMax > rMin)) { rMin -= 0.5; rMax += 0.5; }
+      return [rMin, rMax];
+    }
+    function radiusColors(pos, rMin, rMax) {
+      const n = pos.length / 3;
+      const cols = new Float32Array(n * 3);
+      const tmp = new THREE.Color();
+      const span = Math.max(rMax - rMin, 1e-9);
+      for (let i = 0; i < n; i++) {
+        const r = Math.hypot(pos[i * 3], pos[i * 3 + 1]);
+        colorAtT((r - rMin) / span, tmp);
+        cols[i * 3] = tmp.r;
+        cols[i * 3 + 1] = tmp.g;
+        cols[i * 3 + 2] = tmp.b;
+      }
+      return cols;
+    }
+
+    function meshFrom(block, colors, opacity) {
+      const pos = new Float32Array(block.positions);
+      const idx = new Uint32Array(block.indices);
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      g.setIndex(new THREE.BufferAttribute(idx, 1));
+      g.computeVertexNormals();
+      const mat = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        metalness: 0.08,
+        roughness: 0.68,
+        transparent: opacity < 0.999,
+        opacity: opacity,
+        side: THREE.DoubleSide,
+      });
+      return new THREE.Mesh(g, mat);
+    }
+
+    const reconPos = new Float32Array(DATA.recon.positions);
+    const truthPos = new Float32Array(DATA.truth.positions);
+    const [rMin0, rMax0] = radiusRange(reconPos);
+    const [rMin1, rMax1] = radiusRange(truthPos);
+    const rMin = Math.min(rMin0, rMin1);
+    const rMax = Math.max(rMax0, rMax1);
+    document.getElementById("cbar-min").textContent = rMin.toFixed(1) + " near";
+    document.getElementById("cbar-max").textContent = rMax.toFixed(1) + " far";
+
+    const reconMesh = meshFrom(DATA.recon, radiusColors(reconPos, rMin, rMax), 1.0);
+    const truthMesh = meshFrom(DATA.truth, radiusColors(truthPos, rMin, rMax), 0.32);
+    scene.add(reconMesh);
+    scene.add(truthMesh);
+
+    // Dent highlight ray
+    if (DATA.dentHighlight && DATA.dentHighlight.thetaDeg != null && DATA.dentHighlight.z != null) {
+      const th = DATA.dentHighlight.thetaDeg * Math.PI / 180;
+      // look_unit: x=sin, y=cos in this codebase
+      const ux = Math.sin(th), uy = Math.cos(th);
+      const r = 28;
+      const g = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, DATA.dentHighlight.z),
+        new THREE.Vector3(r * ux, r * uy, DATA.dentHighlight.z)
+      ]);
+      scene.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xffdd66 })));
+    }
+
+    function setMode(mode) {
+      const showR = mode === "recon" || mode === "both";
+      const showT = mode === "truth" || mode === "both";
+      reconMesh.visible = showR;
+      truthMesh.visible = showT;
+      document.getElementById("btn-recon").classList.toggle("on", mode === "recon");
+      document.getElementById("btn-truth").classList.toggle("on", mode === "truth");
+      document.getElementById("btn-both").classList.toggle("on", mode === "both");
+    }
+    document.getElementById("btn-recon").onclick = () => setMode("recon");
+    document.getElementById("btn-truth").onclick = () => setMode("truth");
+    document.getElementById("btn-both").onclick = () => setMode("both");
+    setMode("both");
+
+    addEventListener("resize", () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    (function tick() {
+      requestAnimationFrame(tick);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>

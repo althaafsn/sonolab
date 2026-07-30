@@ -1,0 +1,17 @@
+datasets/runs/
+*.egg-info/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+build/
+crates/**/target/
+*.so
+.mypy_cache/
+.ruff_cache/
+uv.lock
+specfem2d-UT/
+specfem3d/
+cursor-instructions-backup-*/
+docs/demo/block8/_frames/

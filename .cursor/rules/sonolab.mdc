@@ -1,0 +1,27 @@
+---
+description: SonoLab — echo→geometry + SPECFEM/FDTD labs
+alwaysApply: true
+---
+
+# SonoLab
+
+## Vision (locked)
+
+Open research on **in-pipe ultrasonic geometry**: instrument + TX/RX only → **3D wall cloud / map** under unknown pose, fluid \(c\), and defect maps. **Dents are read from the reconstructed surface**, not a standalone detector product. Full plan: `docs/ECHO_TO_GEOMETRY_VISION.md`. Project agent guide: `AGENTS.md`.
+
+- **Lab A (truth):** `pipe2d` / `wave3d` FDTD + SPECFEM2D-UT (known pose/c/defects → RF)
+- **Lab B (blind):** no Lab A truth; **no pipe \(R_\mathrm{nominal}\) or fluid \(c\) prior** (scale-invariant \(A/R\), \(e/R\), \(\theta_0\), \(\tau=R/c\)); with \(c_{\mathrm{cal}}\) → absolute wall XY / pipe3d cloud
+- **Product focus:** primary = cloud/map demo; secondary = shape + uncertainty; tertiary = dent recall/FAR regression only
+- Blocks 1–8 done; evidence `datasets/runs/_pipe2d_joint/`, `datasets/runs/_block8_demo/` (`sonolab block8-demo`)
+- Classical circle+residual (`pipe-reconstruct`) is a **failed baseline**
+- **Public copy:** never name commercial ILI vendors or product lines in README, demos, commits, or LinkedIn
+
+## Layout
+
+- **Home:** this `sonolab/` package tree
+- **Engine:** nested `specfem2d-UT/` (or `SONOLAB_SPECFEM_ROOT` / `SPECFEM2D_DIR`); do not rewrite SPECFEM `src/` for product features
+- **Outputs:** `datasets/runs/<job_id>/artifacts/{ascan.npz,meta.json,a_scan.png}`; pipe3d / Block 8 via `sonolab block8-demo` / `pipe-survey-3d`
+- **Pipe analysis:** `src/sonolab/pipe2d/` + `pipe3d/` - joint reconstruct / survey-3d (primary product path); MC / aperture / uncertainty gates are regression evidence; legacy `pipe-reconstruct`
+- **3D wave sandbox:** `src/sonolab/wave3d/` - `sonolab wave3d-smoke` / `wave3d-live`
+- Portfolio path first: EXAMPLE 01 pulse-echo before custom pipe/ecc SPECFEM meshes
+- Analytics (picks beyond joint, Layer A extras) stay outside this package for now - WaveLab `practice/` is the fast sandbox when needed

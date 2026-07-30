@@ -1,0 +1,28 @@
+{
+  "block": 8,
+  "acquireStepDeg": 1.0,
+  "acquireNz": 16,
+  "displayStepDeg": 1.0,
+  "displayNz": 32,
+  "displayNote": "GitHub demo mesh is 1\u00b0\u00d732 z for size; full evidence used 0.25\u00b0\u00d764 z. Re-run: sonolab block8-demo --c-cal 0.45",
+  "score": {
+    "rAbsRmse": 1.027454,
+    "rAbsRmseOverR": 0.046702,
+    "shapeRmse": 0.01504,
+    "dentThetaEst": 7.002,
+    "dentThetaTrue": 0.0,
+    "dentThetaErrDeg": 7.002,
+    "dentZEst": 40.1,
+    "dentZTrue": 39.5,
+    "dentZErr": 0.6,
+    "pipeR": 22.0,
+    "physics": "3D_scalar_acoustic",
+    "pass": {
+      "rAbsRmseOverR": true,
+      "dentTheta": true,
+      "dentZ": true
+    }
+  },
+  "physics": "3D_scalar_acoustic",
+  "honesty": "Display sampling of fitted wall; acquire was 1\u00b0 \u00d7 16 z"
+}

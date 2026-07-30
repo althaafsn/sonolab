@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sonolab"
+version = "0.1.0"
+description = "Open research: ultrasonic echoes → 3D pipe wall under unknowns"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Althaaf" }]
+dependencies = [
+  "numpy",
+  "scipy",
+  "matplotlib",
+  "PyYAML",
+  "gmsh",
+  "obspy",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+pipe-live = ["glfw", "PyOpenGL"]
+fast-lab-a = []  # build crates/sonolab_pipe2d_fdtd with: maturin develop --release
+
+
+[project.scripts]
+sonolab = "sonolab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sonolab = ["py.typed"]
